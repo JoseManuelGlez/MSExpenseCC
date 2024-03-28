@@ -4,7 +4,9 @@ import org.example.msexpensecc.controller.requests.CreateExpenseRequest;
 import org.example.msexpensecc.controller.responses.BaseResponse;
 import org.example.msexpensecc.controller.responses.GetExpenseResponse;
 import org.example.msexpensecc.entity.Expense;
+import org.example.msexpensecc.entity.User;
 import org.example.msexpensecc.repository.IExpenseRepository;
+import org.example.msexpensecc.repository.IUserRepository;
 import org.example.msexpensecc.service.interfaces.IExpenseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,20 +20,8 @@ public class ExpenseServiceImpl implements IExpenseService {
     @Autowired
     private IExpenseRepository repository;
 
-    @Override
-    public BaseResponse list() {
-        List<GetExpenseResponse> expenses = repository
-                .findAll()
-                .stream()
-                .map(this::from)
-                .collect(Collectors.toList());
-
-        return BaseResponse.builder()
-                .data(expenses)
-                .message("Expenses found")
-                .success(Boolean.TRUE)
-                .httpStatus(HttpStatus.OK).build();
-    }
+    @Autowired
+    private IUserRepository userRepository;
 
     @Override
     public BaseResponse create(CreateExpenseRequest request) {
@@ -40,6 +30,17 @@ public class ExpenseServiceImpl implements IExpenseService {
         return BaseResponse.builder()
                 .data(from(repository.save(expense)))
                 .message("Expense added correctly")
+                .success(Boolean.TRUE)
+                .httpStatus(HttpStatus.CREATED).build();
+    }
+
+    @Override
+    public BaseResponse getExpensesByUserId(String userId) {
+        List<Expense> expenses = repository.findByUserId(userId);
+
+        return BaseResponse.builder()
+                .data(expenses)
+                .message("Expenses found correctly")
                 .success(Boolean.TRUE)
                 .httpStatus(HttpStatus.CREATED).build();
     }
@@ -53,6 +54,10 @@ public class ExpenseServiceImpl implements IExpenseService {
         response.setCategory(expense.getCategory());
         response.setDescription(expense.getDescription());
 
+        User user = userRepository.findUserById(expense.getUser().getId());
+
+        expense.setUser(user);
+
         return response;
     }
 
@@ -63,6 +68,10 @@ public class ExpenseServiceImpl implements IExpenseService {
         expense.setDate(request.getDate());
         expense.setMount(request.getMount());
         expense.setDescription(request.getDescription());
+
+        User user = userRepository.findUserById(request.getUserId());
+
+        expense.setUser(user);
 
         return expense;
     }

@@ -13,9 +13,9 @@ public class ExpenseController {
     @Autowired
     private IExpenseService service;
 
-    @GetMapping
-    public ResponseEntity<BaseResponse> list() {
-        BaseResponse baseResponse = service.list();
+    @GetMapping("{userId}")
+    public ResponseEntity<BaseResponse> getExpensesByUserId(@PathVariable String userId) {
+        BaseResponse baseResponse = service.getExpensesByUserId(userId);
 
         return new ResponseEntity<>(baseResponse, baseResponse.getHttpStatus());
     }

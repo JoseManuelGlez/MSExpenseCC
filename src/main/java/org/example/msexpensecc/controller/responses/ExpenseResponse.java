@@ -4,11 +4,9 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Getter @Setter
-public class GetExpenseResponse {
-    private String id;
+public class ExpenseResponse {
     private Double mount;
     private String category;
     private String date;
     private String description;
-    private String userId;
 }

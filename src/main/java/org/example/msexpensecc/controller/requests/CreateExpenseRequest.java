@@ -9,4 +9,5 @@ public class CreateExpenseRequest {
     private String category;
     private String date;
     private String description;
+    private String userId;
 }
